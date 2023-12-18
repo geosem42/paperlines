@@ -27,7 +27,7 @@ const fetchPapers = async () => {
     const response = await fetch(
       `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(
         searchQuery.value
-      )}&offset=${offset.value}&fields=paperId,title,abstract`,
+      )}&offset=${offset.value}&fields=paperId,title,abstract,referenceCount`,
       {
         headers: {
           "x-api-key": apiKey,
@@ -95,16 +95,7 @@ const viewPaper = async (paperId) => {
     <div v-if="loading" class="flex justify-center items-center">
       <Spinner />
     </div>
-    <PaperList
-      v-else
-      :papers="papers"
-      :offset="offset"
-      :next="next"
-      :total="total"
-      :loadingPaperId="loadingPaperId"
-      @fetchPrevious="fetchPrevious"
-      @fetchNext="fetchNext"
-      @viewPaper="viewPaper"
-    />
+    <PaperList v-else :papers="papers" :offset="offset" :next="next" :total="total" :loadingPaperId="loadingPaperId"
+      @fetchPrevious="fetchPrevious" @fetchNext="fetchNext" @viewPaper="viewPaper" />
   </div>
 </template>
