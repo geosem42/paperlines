@@ -8,11 +8,12 @@ const props = defineProps({
   offset: Number,
   next: Number,
   total: Number,
+  loadingPaperId: String,
 });
 
 let loading = ref(false);
 
-const emit = defineEmits(["fetchPrevious", "fetchNext"]);
+const emit = defineEmits(["fetchPrevious", "fetchNext", "viewPaper"]);
 
 const fetchPrevious = () => {
   emit("fetchPrevious");
@@ -27,6 +28,11 @@ const resultsRange = computed(() => {
   const end = props.offset + props.papers.length;
   return `${start}-${end}`;
 });
+
+const handleViewPaper = (paperId) => {
+  console.log('Received viewPaper event with paperId:', paperId);
+  emit("viewPaper", paperId);
+};
 </script>
 
 <template>
@@ -40,21 +46,23 @@ const resultsRange = computed(() => {
           v-for="paper in papers"
           :key="paper.paperId"
           :paper="paper"
+          :isLoading="paper.paperId === props.loadingPaperId"
+          @viewPaper="handleViewPaper"
         />
       </div>
-      <div v-if="papers.length > 0" class="flex justify-evenly mt-4">
+      <div v-if="papers.length > 0" class="flex justify-center gap-4 mt-4">
         <button
           @click="fetchPrevious"
           :disabled="props.offset === 0"
-          class="px-4 py-2 bg-indigo-500 hover:bg-indigo-700 disabled:bg-indigo-100 text-white rounded"
+          class="px-4 py-2 bg-indigo-700 hover:bg-indigo-800 disabled:bg-indigo-100 text-white rounded-lg"
         >
           Previous
         </button>
-        <div class="p-2 rounded-xl bg-indigo-100">Showing {{ resultsRange }} of {{ total.toLocaleString() }}</div>
+        <div class="p-2 rounded-lg font-semibold bg-indigo-100 text-indigo-700">Showing {{ resultsRange }} of {{ total.toLocaleString() }}</div>
         <button
           @click="fetchNext"
           :disabled="props.next === null"
-          class="px-4 py-2 bg-indigo-500 hover:bg-indigo-700 disabled:bg-indigo-100 text-white rounded"
+          class="px-4 py-2 bg-indigo-700 hover:bg-indigo-800 disabled:bg-indigo-100 text-white rounded-lg"
         >
           Next
         </button>
