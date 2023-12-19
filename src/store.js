@@ -12,15 +12,23 @@ export const useStore = defineStore({
     total: 0,
     paperDetails: null,
     isLoading: false,
-    isFetching: false
+    isFetching: false,
+    searchQuery: "",
   }),
   actions: {
-    async fetchPapers(searchQuery) {
+    setSearchQuery(query) {
+      this.searchQuery = query;
+    },
+    async fetchPapers() {
       this.isFetching = true;
 
       try {
         const response = await fetch(
-          `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(searchQuery)}&offset=${this.offset}&fields=paperId,title,abstract,referenceCount`,
+          `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(
+            this.searchQuery
+          )}&offset=${
+            this.offset
+          }&fields=paperId,title,abstract,referenceCount`,
           {
             headers: {
               "x-api-key": apiKey,
@@ -46,7 +54,7 @@ export const useStore = defineStore({
     async fetchPaperDetails(paperId) {
       this.isLoading = true;
       const response = await fetch(
-        `https://api.semanticscholar.org/graph/v1/paper/${paperId}?fields=references`,
+        `https://api.semanticscholar.org/graph/v1/paper/${paperId}?fields=paperId,title,references`,
         {
           headers: {
             "x-api-key": apiKey,

@@ -7,17 +7,16 @@ import { useStore } from './store';
 
 const store = useStore();
 const searchQuery = ref("");
-const loading = ref(false);
 const loadingPaperId = ref(null);
 
 const handleSearch = (query) => {
-  searchQuery.value = query;
+  store.setSearchQuery(query);
   store.offset = 0;
   searchPapers();
 };
 
 const searchPapers = async () => {
-  await store.fetchPapers(searchQuery.value);
+  await store.fetchPapers();
 };
 
 const fetchPrevious = () => {
