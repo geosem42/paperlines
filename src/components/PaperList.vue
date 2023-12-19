@@ -24,8 +24,7 @@ const handleViewPaper = (paperId) => {
     </div>
     <div v-else>
       <div class="grid grid-cols-1 gap-4">
-        <PaperCard v-for="paper in store.papers" :key="paper.paperId" :paper="paper"
-          :isLoading="paper.paperId === props.loadingPaperId" @viewPaper="handleViewPaper" />
+        <PaperCard v-for="paper in store.papers" :key="paper.paperId" :paper="paper" />
       </div>
       <Pagination />
     </div>

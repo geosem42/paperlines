@@ -6,8 +6,6 @@ import Spinner from "./components/Spinner.vue";
 import { useStore } from './store';
 
 const store = useStore();
-const searchQuery = ref("");
-const loadingPaperId = ref(null);
 
 const handleSearch = (query) => {
   store.setSearchQuery(query);
@@ -28,18 +26,6 @@ const fetchNext = () => {
   store.offset = store.next;
   searchPapers();
 };
-
-const viewPaper = async (paperId) => {
-  loadingPaperId.value = paperId;
-
-  try {
-    await store.fetchPaperDetails(paperId);
-  } catch (error) {
-    console.error("Fetching paper details failed:", error);
-  } finally {
-    loadingPaperId.value = null;
-  }
-};
 </script>
 
 <template>
@@ -48,7 +34,6 @@ const viewPaper = async (paperId) => {
     <div v-if="store.isFetching" class="flex justify-center items-center">
       <Spinner />
     </div>
-    <PaperList v-else :loadingPaperId="loadingPaperId"
-      @fetchPrevious="fetchPrevious" @fetchNext="fetchNext" @viewPaper="viewPaper" />
+    <PaperList v-else @fetchPrevious="fetchPrevious" @fetchNext="fetchNext" />
   </div>
 </template>
