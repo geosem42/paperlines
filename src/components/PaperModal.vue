@@ -30,13 +30,13 @@ watch(
   }
 );
 
-
 </script>
 
 <template>
   <TransitionRoot appear :show="isOpen" as="template">
     <Dialog as="div" @close="closeModal" class="relative z-10">
-      <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100" leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
+      <TransitionChild as="template" enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
+        leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
         <div class="fixed inset-0 bg-black/25" />
       </TransitionChild>
 
@@ -51,29 +51,21 @@ watch(
                 {{ props.paper.title }}
               </DialogTitle>
 
-              <div v-if="store.isLoading">
-                <Spinner />
-              </div>
+              <div id="chart"></div>
+              <p class="text-sm text-gray-500">
+              <ul>
+                <li v-for="reference in props.paper.references" :key="reference.paperId">
+                  {{ reference.title }}
+                </li>
+              </ul>
+              </p>
 
-              <div v-else>
-                <div v-if="!store.isLoading" class="mt-2">
-                  <div id="chart"></div>
-                  <p class="text-sm text-gray-500">
-                    <ul>
-                      <li v-for="reference in props.paper.references" :key="reference.paperId">
-                        {{ reference.title }}
-                      </li>
-                    </ul>
-                  </p>
-                </div>
-
-                <div class="mt-4">
-                  <button type="button"
-                    class="inline-flex justify-center rounded-md border border-transparent bg-indigo-100 px-4 py-2 text-sm font-medium text-indigo-900 hover:bg-indigo-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
-                    @click="$emit('closeModal')">
-                    Close
-                  </button>
-                </div>
+              <div class="mt-4">
+                <button type="button"
+                  class="inline-flex justify-center rounded-md border border-transparent bg-indigo-100 px-4 py-2 text-sm font-medium text-indigo-900 hover:bg-indigo-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+                  @click="$emit('closeModal')">
+                  Close
+                </button>
               </div>
             </DialogPanel>
           </TransitionChild>

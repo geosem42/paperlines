@@ -9,7 +9,6 @@ const childModal = ref(null);
 
 const props = defineProps({
   paper: Object,
-  isLoading: Boolean,
 });
 
 const isOpen = ref(false);

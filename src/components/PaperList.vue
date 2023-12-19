@@ -12,9 +12,6 @@ const props = defineProps({
 
 const emit = defineEmits(["viewPaper"]);
 
-const handleViewPaper = (paperId) => {
-  emit("viewPaper", paperId);
-};
 </script>
 
 <template>

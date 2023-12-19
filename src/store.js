@@ -9,9 +9,8 @@ export const useStore = defineStore("main", () => {
   const offset = ref(0);
   const next = ref(null);
   const total = ref(0);
-  const isLoading = ref(false);
   const isFetching = ref(false);
-  const searchQuery = ref("");
+  const searchQuery = ref(null);
 
   const setSearchQuery = (query) => {
     searchQuery.value = query;
@@ -53,7 +52,6 @@ export const useStore = defineStore("main", () => {
     offset,
     next,
     total,
-    isLoading,
     isFetching,
     searchQuery,
     setSearchQuery,
