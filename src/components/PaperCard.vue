@@ -1,6 +1,8 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import PaperModal from "./PaperModal.vue";
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
 
 const emit = defineEmits(["viewPaper"]);
 const childModal = ref(null);
@@ -21,6 +23,13 @@ const handleViewPaper = () => {
   isOpen.value = true;
 };
 
+onMounted(() => {
+
+  tippy('#references', {
+    content: 'References',
+  });
+});
+
 </script>
 
 <template>
@@ -31,10 +40,10 @@ const handleViewPaper = () => {
           {{ paper.title }}
         </h5>
       </a>
-      <span
-        class="flex items-center bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded-lg dark:bg-indigo-900 dark:text-indigo-300">
+      <button id="references"
+        class="flex items-center bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded-lg">
         {{ paper.referenceCount }}
-      </span>
+    </button>
     </div>
 
     <p v-if="paper.abstract" class="mb-3 font-normal text-gray-700">
@@ -56,4 +65,5 @@ const handleViewPaper = () => {
   </div>
 
   <PaperModal :paper="props.paper" :isOpen="isOpen" @closeModal="closeModal" ref="childModal" />
+
 </template>
