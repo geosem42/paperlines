@@ -1,32 +1,30 @@
 <script setup>
-import { ref } from 'vue'
 import {
   TransitionRoot,
   TransitionChild,
   Dialog,
   DialogPanel,
   DialogTitle,
-} from '@headlessui/vue'
+} from "@headlessui/vue";
+import Spinner from "./Spinner.vue";
+import * as zingchart from "zingchart/es6";
+import "zingchart/modules-es6/zingchart-tree.min.js";
+import { useStore } from "../store";
 
-const isOpen = ref(false)
+const store = useStore();
+const emit = defineEmits(["closeModal"]);
 
 const props = defineProps({
-  paper: {
-    type: Object,
-  },
-})
+  paper: Object,
+  isOpen: Boolean,
+});
 
 function closeModal() {
-  isOpen.value = false
+  emit("closeModal");
 }
-function openModal() {
-  isOpen.value = true
-}
-
 defineExpose({
-  openModal,
-  closeModal
-})
+  closeModal,
+});
 </script>
 
 <template>
@@ -47,18 +45,29 @@ defineExpose({
               <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
                 {{ props.paper.title }}
               </DialogTitle>
-              <div class="mt-2">
-                <p class="text-sm text-gray-500">
-                  lorem ipsum
-                </p>
+
+              <div v-if="store.isLoading">
+                <Spinner />
               </div>
 
-              <div class="mt-4">
-                <button type="button"
-                  class="inline-flex justify-center rounded-md border border-transparent bg-indigo-100 px-4 py-2 text-sm font-medium text-indigo-900 hover:bg-indigo-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
-                  @click="closeModal">
-                  Close
-                </button>
+              <div v-else>
+                <div v-if="!store.isLoading" class="mt-2">
+                  <p class="text-sm text-gray-500">
+                    <ul>
+                      <li v-for="reference in store.paperDetails.references" :key="reference.paperId">
+                        {{ reference.title }}
+                      </li>
+                    </ul>
+                  </p>
+                </div>
+
+                <div class="mt-4">
+                  <button type="button"
+                    class="inline-flex justify-center rounded-md border border-transparent bg-indigo-100 px-4 py-2 text-sm font-medium text-indigo-900 hover:bg-indigo-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+                    @click="$emit('closeModal')">
+                    Close
+                  </button>
+                </div>
               </div>
             </DialogPanel>
           </TransitionChild>
