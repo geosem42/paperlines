@@ -11,6 +11,7 @@ const paper = ref(null);
 const graphContainer = ref(null);
 const highlightedNode = reactive({ id: null });
 const highlightedLink = ref(null);
+const referenceElements = reactive({});
 
 onMounted(() => {
 	const paperId = route.params.paperId;
@@ -130,9 +131,11 @@ const createForceDirectedGraph = (nodes, links) => {
 				highlightedNode.id = d.id;
 				highlightedLink.value = d.id;
 			}
+			// Scroll to the li element
+			if (referenceElements[d.id]) {
+				referenceElements[d.id].scrollIntoView({ behavior: 'smooth' });
+			}
 		});
-
-
 
 	node.on('mouseover', function (event, d) {
 		d3.select(this).style('cursor', 'pointer');
@@ -207,7 +210,7 @@ watch(
 	() => highlightedNode.id,
 	(newNodeId) => {
 		if (newNodeId) {
-			d3.select('#node-' + newNodeId).style('fill', '#4338CA'); // Prepend 'node-' to the ID
+			d3.select('#node-' + newNodeId).style('fill', '#4338CA');
 		}
 	}
 );
@@ -233,7 +236,7 @@ watch(
 					</div>
 					<div class="flex items-center lg:order-2">
 						<button type="button" data-dropdown-toggle="notification-dropdown"
-							class="p-2 mr-1 bg-indigo-100 text-indigo-600 rounded-lg hover:text-gray-100 hover:bg-indigo-500 focus:ring-4 focus:ring-gray-300">
+							class="p-2 mr-1 bg-indigo-100 text-indigo-600 rounded-lg hover:text-gray-100 hover:bg-indigo-500 focus:ring-4 focus:ring-gray-300 font-semibold">
 							<span class="sr-only">Number of References</span>
 							{{ paper.referenceCount }}
 						</button>
@@ -247,16 +250,17 @@ watch(
 			</div>
 
 			<div class="w-full md:w-1/3 p-4">
-					<h2 class="text-indigo-700 font-bold text-lg">Referenced Papers</h2>
-					<ul role="list" class="divide-y divide-gray-100 overflow-y-auto max-h-[600px] ">
-					<li v-for="reference in paper.references" :key="reference.paperId" class="flex justify-between gap-x-6 p-5 rounded-lg"
-					:class="{ 'bg-indigo-200': highlightedLink === reference.paperId, 'text-gray-600': highlightedLink !== reference.paperId }">
-						<div class="flex min-w-0 gap-x-4 ">
+				<h2 class="text-indigo-700 font-bold text-lg">Referenced Papers</h2>
+				<ul role="list" class="divide-y divide-gray-100 overflow-y-auto max-h-[600px]">
+					<li v-for="reference in paper.references" :key="reference.paperId"
+						class="flex justify-between gap-x-6 p-5 rounded-lg"
+						:class="{ 'bg-indigo-100': highlightedLink === reference.paperId, 'text-gray-600': highlightedLink !== reference.paperId }"
+						:ref="el => { if (el && reference.paperId) referenceElements[reference.paperId] = el; }">
+						<div class="flex min-w-0 gap-x-4">
 							<div class="min-w-0 flex-auto">
-								<a href="#" 
-									:class="{ 'text-indigo-700': highlightedLink === reference.paperId, 'text-gray-600': highlightedLink !== reference.paperId }" 
-									class="text-sm font-semibold leading-6 hover:text-indigo-700" 
-									@click="highlightNode(reference)">
+								<a href="#"
+									:class="{ 'text-indigo-700': highlightedLink === reference.paperId, 'text-gray-600': highlightedLink !== reference.paperId }"
+									class="text-sm font-semibold leading-6 hover:text-indigo-700" @click="highlightNode(reference)">
 									{{ reference.title }}
 								</a>
 							</div>
