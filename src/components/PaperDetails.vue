@@ -115,14 +115,24 @@ const createForceDirectedGraph = (nodes, links) => {
 		.call(drag(simulation))
 		.attr('id', d => 'node-' + d.id)
 		.on('click', function (event, d) {
-			if (d3.select(this).style('fill') === 'indigo') {
+			if (highlightedNode.id && highlightedNode.id === d.id) {
+				// If the clicked node is already highlighted, dehighlight it
 				d3.select(this).style('fill', d === originNode ? '#800080' : '#69b3a2');
 				highlightedNode.id = null;
+				highlightedLink.value = null;
 			} else {
-				d3.select(this).style('fill', 'indigo');
+				// If another node is highlighted, dehighlight it
+				if (highlightedNode.id) {
+					d3.select('#node-' + highlightedNode.id).style('fill', d === originNode ? '#800080' : '#69b3a2');
+				}
+				// Highlight the clicked node
+				d3.select(this).style('fill', '#4338CA');
 				highlightedNode.id = d.id;
+				highlightedLink.value = d.id;
 			}
 		});
+
+
 
 	node.on('mouseover', function (event, d) {
 		d3.select(this).style('cursor', 'pointer');
@@ -155,16 +165,16 @@ const createForceDirectedGraph = (nodes, links) => {
 const highlightNode = (reference) => {
 	if (highlightedLink.value === reference.paperId) {
 		// If the link is already highlighted, dehighlight it
-		d3.select('#node-' + highlightedNode.id).style('fill', '#69b3a2'); // Use a default color for dehighlighting
+		d3.select('#node-' + highlightedNode.id).style('fill', '#69b3a2');
 		highlightedNode.id = null;
 		highlightedLink.value = null;
 	} else {
 		// If the link is not highlighted, highlight it
 		if (highlightedNode.id) {
 			// If there is another node highlighted, dehighlight it
-			d3.select('#node-' + highlightedNode.id).style('fill', '#69b3a2'); // Use a default color for dehighlighting
+			d3.select('#node-' + highlightedNode.id).style('fill', '#69b3a2');
 		}
-		d3.select('#node-' + reference.paperId).style('fill', 'indigo');
+		d3.select('#node-' + reference.paperId).style('fill', '#4338CA');
 		highlightedNode.id = reference.paperId;
 		highlightedLink.value = reference.paperId;
 	}
@@ -197,7 +207,7 @@ watch(
 	() => highlightedNode.id,
 	(newNodeId) => {
 		if (newNodeId) {
-			d3.select('#node-' + newNodeId).style('fill', 'indigo'); // Prepend 'node-' to the ID
+			d3.select('#node-' + newNodeId).style('fill', '#4338CA'); // Prepend 'node-' to the ID
 		}
 	}
 );
@@ -238,9 +248,10 @@ watch(
 
 			<div class="w-full md:w-1/3 p-4">
 					<h2 class="text-indigo-700 font-bold text-lg">Referenced Papers</h2>
-					<ul role="list" class="divide-y divide-gray-100 overflow-y-auto max-h-[600px]">
-					<li v-for="reference in paper.references" :key="reference.paperId" class="flex justify-between gap-x-6 py-5">
-						<div class="flex min-w-0 gap-x-4">
+					<ul role="list" class="divide-y divide-gray-100 overflow-y-auto max-h-[600px] ">
+					<li v-for="reference in paper.references" :key="reference.paperId" class="flex justify-between gap-x-6 p-5 rounded-lg"
+					:class="{ 'bg-indigo-200': highlightedLink === reference.paperId, 'text-gray-600': highlightedLink !== reference.paperId }">
+						<div class="flex min-w-0 gap-x-4 ">
 							<div class="min-w-0 flex-auto">
 								<a href="#" 
 									:class="{ 'text-indigo-700': highlightedLink === reference.paperId, 'text-gray-600': highlightedLink !== reference.paperId }" 
