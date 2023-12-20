@@ -135,14 +135,6 @@ const createForceDirectedGraph = (nodes, links) => {
 			if (referenceElements[d.id]) {
 				referenceElements[d.id].scrollIntoView({ behavior: 'smooth' });
 			}
-			// Zoom in on the clicked node
-			const transform = d3.zoomIdentity
-				.translate(width / 2, height / 2)
-				.scale(4)
-				.translate(-d.x, -d.y);
-			svg.transition()
-				.duration(750)
-				.call(zoom.transform, transform);
 		});
 
 	node.on('mouseover', function (event, d) {
@@ -185,11 +177,23 @@ const highlightNode = (reference) => {
 			// If there is another node highlighted, dehighlight it
 			d3.select('#node-' + highlightedNode.id).style('fill', '#69b3a2');
 		}
-		d3.select('#node-' + reference.paperId).style('fill', '#4338CA');
+		const nodeToHighlight = d3.select('#node-' + reference.paperId);
+		nodeToHighlight.style('fill', '#4338CA');
 		highlightedNode.id = reference.paperId;
 		highlightedLink.value = reference.paperId;
+
+		// Make the node pulse 3 times
+		for (let i = 0; i < 3; i++) {
+			nodeToHighlight.transition()
+				.duration(500)
+				.attr('r', 20)
+				.transition()
+				.duration(500)
+				.attr('r', 5);
+		}
 	}
 };
+
 
 watch(
 	() => paper.value,

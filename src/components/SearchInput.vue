@@ -22,7 +22,7 @@ const handleInput = () => {
       </div>
       <input type="search" id="paper-search" v-model="searchQuery" @keyup.enter="handleInput"
         placeholder="Enter paper title, author, or topic"
-        class="block w-full p-4 ps-10 text-sm text-indigo-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-indigo-500 focus:border-indigo-700"
+        class="block w-full p-4 ps-10 text-sm text-indigo-900 border-2 focus:border-2 border-gray-300 rounded-lg bg-gray-50 focus:ring-indigo-700 focus:border-indigo-700 focus:outline-none "
         required>
 
       <button @click="handleInput" type="button"
