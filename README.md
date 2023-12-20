@@ -1,7 +1,14 @@
-# Vue 3 + Vite
+# PaperLines
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+This repository contains a dynamic and interactive data visualization project built with Vue.js and D3.js. It provides a unique way to visualize academic papers and their references. Each paper is represented as a node in a force-directed graph, and references between papers are represented as links. Users can click on a node to highlight it and view the paper’s title. The list of referenced papers is also displayed, and clicking on a paper in the list highlights the corresponding node in the graph.
 
-## Recommended IDE Setup
+# Installation
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+Install packages
+```
+npm install
+```
+Run server
+```
+npm run dev
+```

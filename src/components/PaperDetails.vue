@@ -135,6 +135,14 @@ const createForceDirectedGraph = (nodes, links) => {
 			if (referenceElements[d.id]) {
 				referenceElements[d.id].scrollIntoView({ behavior: 'smooth' });
 			}
+			// Zoom in on the clicked node
+			const transform = d3.zoomIdentity
+				.translate(width / 2, height / 2)
+				.scale(4)
+				.translate(-d.x, -d.y);
+			svg.transition()
+				.duration(750)
+				.call(zoom.transform, transform);
 		});
 
 	node.on('mouseover', function (event, d) {
