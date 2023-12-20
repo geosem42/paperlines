@@ -251,10 +251,10 @@ watch(
 
 			<div class="w-full md:w-1/3 p-4">
 				<h2 class="text-indigo-700 font-bold text-lg">Referenced Papers</h2>
-				<ul role="list" class="divide-y divide-gray-100 overflow-y-auto max-h-[600px]">
+				<ul role="list" class="divide-y divide-gray-100 rounded-lg bg-indigo-50 overflow-y-auto max-h-[600px]">
 					<li v-for="reference in paper.references" :key="reference.paperId"
 						class="flex justify-between gap-x-6 p-5 rounded-lg"
-						:class="{ 'bg-indigo-100': highlightedLink === reference.paperId, 'text-gray-600': highlightedLink !== reference.paperId }"
+						:class="{ 'bg-indigo-200': highlightedLink === reference.paperId, 'text-gray-600': highlightedLink !== reference.paperId }"
 						:ref="el => { if (el && reference.paperId) referenceElements[reference.paperId] = el; }">
 						<div class="flex min-w-0 gap-x-4">
 							<div class="min-w-0 flex-auto">
