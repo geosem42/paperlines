@@ -36,7 +36,6 @@ export const useStore = defineStore("main", () => {
       }
 
       const data = await response.json();
-      console.log(data)
       papers.value = data.data;
       offset.value = data.offset;
       next.value = data.next;

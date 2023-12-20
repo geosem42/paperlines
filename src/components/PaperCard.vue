@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import PaperModal from "./PaperModal.vue";
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 
@@ -66,6 +65,4 @@ onMounted(() => {
       Visualize
     </router-link>
   </div>
-
-  <PaperModal :paper="props.paper" :isOpen="isOpen" @closeModal="closeModal" ref="childModal" />
 </template>
