@@ -1,11 +1,13 @@
 <script setup>
-import { ref } from "vue";
+import { computed } from 'vue'
 import SearchInput from "./components/SearchInput.vue";
 import PaperList from "./components/PaperList.vue";
 import Spinner from "./components/Spinner.vue";
 import { useStore } from './store';
+import { useRoute } from 'vue-router';
 
 const store = useStore();
+const route = useRoute();
 
 const handleSearch = (query) => {
   store.setSearchQuery(query);
@@ -26,14 +28,17 @@ const fetchNext = () => {
   store.offset = store.next;
   searchPapers();
 };
+
+const showSearchInput = computed(() => !route.path.includes('/papers/'));
 </script>
 
 <template>
   <div class="container mx-auto p-8">
-    <SearchInput @search="handleSearch" />
-    <div v-if="store.isFetching" class="flex justify-center items-center">
+    <SearchInput v-if="showSearchInput" @search="handleSearch" />
+    <router-view></router-view>
+    <!-- <div v-if="store.isFetching" class="flex justify-center items-center">
       <Spinner />
     </div>
-    <PaperList v-else @fetchPrevious="fetchPrevious" @fetchNext="fetchNext" />
+    <PaperList v-else @fetchPrevious="fetchPrevious" @fetchNext="fetchNext" /> -->
   </div>
 </template>

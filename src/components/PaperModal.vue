@@ -1,18 +1,126 @@
 <script setup>
-import { watch } from "vue";
+import { ref, onMounted, watch, nextTick } from "vue";
 import { TransitionRoot, TransitionChild, Dialog, DialogPanel, DialogTitle } from "@headlessui/vue";
-import Spinner from "./Spinner.vue";
-import * as zingchart from "zingchart/es6";
-import "zingchart/modules-es6/zingchart-tree.min.js";
-import { useStore } from "../store";
+import * as d3 from 'd3';
 
-const store = useStore();
 const emit = defineEmits(["closeModal"]);
+const graphContainer = ref(null);
 
 const props = defineProps({
   paper: Object,
   isOpen: Boolean,
 });
+
+const createForceDirectedGraph = (nodes, links) => {
+  d3.select(graphContainer.value).selectAll("*").remove();
+  const width = 1000;
+  const height = 600;
+  const drag = simulation => {
+    function dragstarted(event) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      event.subject.fx = event.subject.x;
+      event.subject.fy = event.subject.y;
+    }
+
+    function dragged(event) {
+      event.subject.fx = event.x;
+      event.subject.fy = event.y;
+    }
+
+    function dragended(event) {
+      if (!event.active) simulation.alphaTarget(0);
+      event.subject.fx = null;
+      event.subject.fy = null;
+    }
+
+    return d3.drag()
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended);
+  }
+
+  const svg = d3.select(graphContainer.value)
+    .append('svg')
+    .attr('width', width)
+    .attr('height', height);
+
+  const nodeIds = new Set(nodes.map(node => node.id));
+  links.forEach(link => {
+    if (!nodeIds.has(link.source) || !nodeIds.has(link.target)) {
+      console.error('Link with non-existent node:', link);
+    }
+  });
+  
+  const validLinks = links.filter(link => nodeIds.has(link.source) && nodeIds.has(link.target));
+
+  const simulation = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(validLinks).id(d => d.id))
+    .force('charge', d3.forceManyBody().strength(-5000))
+    .force('center', d3.forceCenter(width / 2, height / 2));
+
+  const link = svg.append('g')
+    .selectAll('line')
+    .data(links)
+    .join('line')
+    .style('stroke', '#999')
+    .style('stroke-opacity', 0.6)
+    .style('stroke-width', d => Math.sqrt(d.value));
+
+  // Calculate the degree for each node based on the links
+  nodes.forEach(node => {
+    node.degree = links.reduce((acc, link) => {
+      return acc + (link.source === node || link.target === node ? 1 : 0);
+    }, 0);
+  });
+
+  // Sort nodes by degree and take the one with the highest degree as the origin node
+  const originNode = nodes.sort((a, b) => b.degree - a.degree)[0];
+
+  const node = svg.append('g')
+    .selectAll('circle')
+    .data(nodes)
+    .join('circle')
+    .attr('r', 15)
+    .style('fill', d => d === originNode ? '#800080' : '#69b3a2') // Use purple for the origin node
+    .call(drag(simulation));
+
+  const text = svg.append('g')
+    .selectAll('text')
+    .data(nodes)
+    .join('text')
+    .text(d => d.name)
+    .style('font-size', '12px')
+    .style('text-anchor', 'middle')
+    .style('fill', '#555')
+    .style('opacity', 0) // Set initial opacity to 0 to hide text
+    .style('pointer-events', 'none'); // Make sure the text itself does not interfere with mouse events
+
+  node.on('mouseover', function (event, d) {
+    d3.select(this).style('cursor', 'pointer'); // Optional: change the cursor on hover
+    d3.select(text.nodes()[nodes.indexOf(d)])
+      .style('opacity', 1); // Show the text element on hover
+  })
+    .on('mouseout', function (event, d) {
+      d3.select(text.nodes()[nodes.indexOf(d)])
+        .style('opacity', 0); // Hide the text element when not hovering
+    });
+
+  simulation.on('tick', () => {
+    link
+      .attr('x1', d => d.source.x)
+      .attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x)
+      .attr('y2', d => d.target.y);
+
+    node
+      .attr('cx', d => d.x)
+      .attr('cy', d => d.y);
+
+    text
+      .attr('x', d => d.x)
+      .attr('y', d => d.y);
+  });
+};
 
 function closeModal() {
   emit("closeModal");
@@ -23,12 +131,47 @@ defineExpose({
 
 watch(
   () => [props.isOpen, props.paper],
-  ([newIsOpen, newPaperDetails]) => {
+  async ([newIsOpen, newPaperDetails]) => {
     if (newIsOpen && newPaperDetails) {
-      console.log('props: ', props.paper);
+      await nextTick();
+      console.log('props.isOpen: ', props.isOpen)
+      console.log('props.paper: ', props.paper)
+      if (graphContainer.value) {
+        const nodes = [
+          { id: props.paper.paperId, name: props.paper.title, group: 0 },
+          ...props.paper.references.map(ref => ({ id: ref.paperId, name: ref.title, group: 1 }))
+        ];
+        const links = props.paper.references.map(ref => ({
+          source: props.paper.paperId,
+          target: ref.paperId,
+          value: 1
+        }));
+        createForceDirectedGraph(nodes, links);
+      } else {
+        console.error('Graph container element is still not available.');
+      }
     }
-  }
+  }, { immediate: true }
 );
+
+
+onMounted(() => {
+  console.log('onMounted triggered');
+  if (props.isOpen && props.paper) {
+    const nodes = [
+      { id: props.paper.paperId, name: props.paper.title, group: 0 },
+      ...props.paper.references.map(ref => ({ id: ref.paperId, name: ref.title, group: 1 }))
+    ];
+
+    const links = props.paper.references.map(ref => ({
+      source: props.paper.paperId,
+      target: ref.paperId,
+      value: 1
+    }));
+
+    createForceDirectedGraph(nodes, links);
+  }
+})
 
 </script>
 
@@ -51,7 +194,7 @@ watch(
                 {{ props.paper.title }}
               </DialogTitle>
 
-              <div id="chart"></div>
+              <div ref="graphContainer"></div>
               <p class="text-sm text-gray-500">
               <ul>
                 <li v-for="reference in props.paper.references" :key="reference.paperId">

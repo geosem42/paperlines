@@ -10,12 +10,14 @@
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.16",
+    "d3": "^7.8.5",
     "pinia": "^2.1.7",
     "tippy.js": "^6.3.7",
     "vue": "^3.3.11",
-    "zingchart": "^2.9.13"
+    "vue-router": "^4.2.5"
   },
   "devDependencies": {
+    "@types/d3": "^7.4.3",
     "@vitejs/plugin-vue": "^4.5.2",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.32",
